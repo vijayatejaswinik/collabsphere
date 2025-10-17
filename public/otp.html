@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OTP Verification - Collabsphere</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Verify Your Email</h1>
+    </header>
+
+    <main>
+        <form id="otpForm">
+            <input type="text" id="otp" placeholder="Enter 6-digit OTP" required>
+            <button type="submit">Verify</button>
+        </form>
+        <p id="message"></p>
+    </main>
+
+    <script>
+        const form = document.getElementById('otpForm');
+        const message = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('otp').value;
+            const userId = sessionStorage.getItem('userId');
+            if(!userId){
+                message.textContent = 'No registration found.';
+                return;
+            }
+
+            const res = await fetch('/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, otp })
+            });
+
+            const data = await res.json();
+            if(data.ok){
+                alert('OTP verified! You can now login.');
+                window.location.href = 'login.html';
+            } else {
+                message.textContent = data.error;
+            }
+        });
+    </script>
+</body>
+</html>

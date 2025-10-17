@@ -1,0 +1,256 @@
+/* ===========================================
+   Collabsphere – Modern Grayscale Theme
+   Palette: #595959, #7f7f7f, #a5a5a5, #cccccc, #f2f2f2
+   Typography: Inter / Poppins
+=========================================== */
+
+body {
+  font-family: "Inter", "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f2f2f2; /* soft background */
+  color: #333;
+  line-height: 1.6;
+}
+
+/* === Header === */
+header {
+  background: #595959; /* darkest tone */
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+nav a,
+nav button {
+  color: #f2f2f2;
+  margin-left: 1rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+
+nav a:hover,
+nav button:hover {
+  opacity: 0.8;
+}
+
+/* === Sidebar === */
+#sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 240px;
+  height: 100%;
+  background-color: #7f7f7f;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+#sidebar.show {
+  transform: translateX(0);
+}
+
+#sidebar a,
+#sidebar button {
+  color: #fff;
+  text-decoration: none;
+  margin: 10px 0;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+#sidebar a:hover,
+#sidebar button:hover {
+  background: #595959;
+}
+
+/* === Main Content === */
+main {
+  padding: 2.5rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+main h2 {
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #595959;
+  margin-bottom: 1.2rem;
+}
+
+/* === Forms === */
+form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #595959;
+}
+
+form input,
+form textarea,
+form select {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+  border-color: #7f7f7f;
+  box-shadow: 0 0 0 3px rgba(127, 127, 127, 0.2);
+  outline: none;
+}
+
+/* === Buttons === */
+button,
+form button {
+  background: #7f7f7f;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem 1.6rem;
+  border-radius: 6px;
+  transition: transform 0.1s, opacity 0.2s, background 0.2s;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+button:hover,
+form button:hover {
+  background: #595959;
+  transform: translateY(-1px);
+}
+
+button.ghost {
+  background: none;
+  color: #595959;
+  border: 1px solid #595959;
+}
+
+button.ghost:hover {
+  background: #cccccc;
+}
+
+button.danger {
+  background: #a33a3a;
+}
+
+button.danger:hover {
+  background: #8a2f2f;
+}
+
+/* === Cards / Projects === */
+.card {
+  background: #fff;
+  padding: 1.6rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+#projectsList div {
+  border-bottom: 1px solid #cccccc;
+  padding: 1rem 0;
+}
+#projectsList div:last-child {
+  border-bottom: none;
+}
+
+/* === Info Chips === */
+.chip {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 12px;
+  background: #cccccc;
+  color: #333;
+  font-size: 0.85rem;
+  margin-right: 6px;
+}
+
+/* === Notifications === */
+.notification-item {
+  border: 1px solid #cccccc;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #fff;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+.notification-item:hover {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.notification-item.unread {
+  background: #e6e6e6;
+  border-left: 5px solid #595959;
+}
+.notification-item p {
+  margin: 0 0 5px 0;
+}
+.notification-item small {
+  color: #7f7f7f;
+  display: block;
+  font-size: 0.8rem;
+}
+.notification-item a {
+  color: #595959;
+  text-decoration: none;
+  font-weight: 600;
+}
+.notification-item a:hover {
+  text-decoration: underline;
+}
+
+/* === Footer === */
+footer {
+  text-align: center;
+  padding: 1.2rem;
+  background: #7f7f7f;
+  color: #f2f2f2;
+  font-size: 0.9rem;
+  margin-top: 3rem;
+  letter-spacing: 0.3px;
+  border-top: 1px solid #595959;
+}

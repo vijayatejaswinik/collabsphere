@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Collabsphere - Home</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Collabsphere</h1>
+    <nav>
+      <button id="sidebarToggle">☰</button>
+    </nav>
+  </header>
+
+  <aside id="sidebar">
+    <a href="profile.html">My Profile</a>
+    <a href="create-project.html">Projects</a>
+    <a href="notifications.html">Notifications</a>
+  <!--  <a href="admin.html" id="adminLink">Admin Panel</a> -->
+    <button id="logoutBtn">Logout</button>
+  </aside>
+
+<main>
+  <h2>Welcome to Collabsphere!</h2>
+  <p class="intro">
+    Collabsphere is a platform that connects creators, developers, and designers to collaborate on exciting projects together.
+    <br><br>
+    Whether you’re a student, freelancer, or entrepreneur — you can post your ideas, find team members, and work together remotely.
+  </p>
+
+  <section class="features">
+    <h3>Key Features</h3>
+    <ul>
+      <li>Post and discover collaboration projects easily.</li>
+      <li>Apply to join teams or create your own projects.</li>
+      <li>Built-in profile system to showcase your skills.</li>
+      <li>Notifications to stay updated on opportunities.</li>
+    </ul>
+  </section>
+
+  <section class="cta">
+    <h3>Start Exploring</h3>
+    <p>
+      Go to the <a href="create-project.html">Projects</a> page to view or create new collaboration projects!
+    </p>
+  </section>
+</main>
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const adminLink = document.getElementById('adminLink'); // may be null if commented out
+    const logoutBtn = document.getElementById('logoutBtn');
+    const projectsList = document.getElementById('projectsList');
+
+    // Toggle sidebar open/close
+    toggleBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      sidebar.classList.toggle('show');
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (event) => {
+      if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+        sidebar.classList.remove('show');
+      }
+    });
+
+    // Hide admin link safely if it's present
+    const isAdmin = sessionStorage.getItem('isAdmin') === '1';
+    if (adminLink && !isAdmin) {
+      adminLink.style.display = 'none';
+    }
+
+    // Logout: call backend to destroy session, then clear frontend storage and redirect.
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        // ensure cookie is sent so server can destroy the correct session
+        await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+      } catch (err) {
+        console.error('Logout API error:', err);
+      }
+
+      // Clear client-side storage and redirect
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    // Load projects (tries a couple of possible endpoints for compatibility)
+   /* async function loadProjects() {
+      projectsList.innerHTML = '<p>Loading projects…</p>';
+
+      const endpoints = [
+        '/api/projects',      // preferred (matches server mounting in server.js)
+        '/api/projects/all',  // fallback
+        '/projects/all'       // older/fallback route
+      ];
+
+      let projects = [];
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, { credentials: 'include' });
+          if (!res.ok) {
+            // try next endpoint
+            continue;
+          }
+          const data = await res.json();
+          // basic validation
+          if (Array.isArray(data)) {
+            projects = data;
+            break;
+          }
+        } catch (err) {
+          // network / fetch error — try the next endpoint
+          console.warn(`Fetch failed for ${ep}:`, err);
+        }
+      }
+
+      // render
+      projectsList.innerHTML = '';
+      if (!projects.length) {
+        projectsList.innerHTML = '<p>No projects found.</p>';
+        return;
+      }
+
+      projects.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'project-card';
+        div.innerHTML = `
+          <h3>${escapeHtml(p.title || 'Untitled')}</h3>
+          <p>${escapeHtml(p.description || '')}</p>
+          <p>Owner: ${escapeHtml(p.owner_name || p.owner || 'Unknown')}</p>
+          <div class="project-actions">
+            <button class="apply-btn" data-id="${p.id}">Apply</button>
+            <button class="share-btn" data-id="${p.id}">Share</button>
+          </div>
+        `;
+        projectsList.appendChild(div);
+      });
+
+      // delegate events for apply/share buttons
+      projectsList.addEventListener('click', async (e) => {
+        const applyBtn = e.target.closest('.apply-btn');
+        const shareBtn = e.target.closest('.share-btn');
+
+        if (applyBtn) {
+          const id = applyBtn.getAttribute('data-id');
+          await apply(id);
+        } else if (shareBtn) {
+          const id = shareBtn.getAttribute('data-id');
+          copyLink(id);
+        }
+      });
+    }
+
+    // Apply to project (POST) — sends credentials so server-side session is used
+    async function apply(id) {
+      try {
+        const res = await fetch('/api/projects/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ projectId: id })
+        });
+        const data = await res.json();
+        alert(data.message || (data.error || 'Applied (no message)'));
+      } catch (err) {
+        console.error('Apply error:', err);
+        alert('Failed to apply. Please try again.');
+      }
+    }
+
+    // copy link to clipboard
+    function copyLink(id) {
+      const url = `${window.location.origin}/project.html?id=${id}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Project link copied!');
+      }).catch(err => {
+        console.error('Clipboard error:', err);
+        prompt('Copy this link:', url);
+      });
+    }
+
+    // small helper to escape HTML (avoid XSS in inserted values)
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    // initial load
+    loadProjects();  */
+  });
+  </script>
+</body>
+</html>
