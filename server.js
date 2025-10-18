@@ -15,6 +15,11 @@ const selectionRoutes = require('./routes/selection');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.get("/test", (req, res) => {
+  res.send("✅ Backend is running fine!");
+});
+
+
 // ✅ Updated CORS (allows cookies + multi-origin local testing)
 app.use(cors({
   origin: ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500'],
