@@ -1,6 +1,7 @@
 // routes/auth.js - FINAL FIXED VERSION
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const { sendOtpEmail } = require('./email');

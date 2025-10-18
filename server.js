@@ -4,6 +4,8 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const axios = require('axios');
+axios.defaults.withCredentials = true;
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
