@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+axios.defaults.withCredentials = true;
+
 
 // Middleware to allow only admin
 router.use((req, res, next) => {

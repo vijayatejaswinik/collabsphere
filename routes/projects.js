@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+axios.defaults.withCredentials = true;
+
+
 // --- Helper function to get Admin ID (assuming one admin for simplicity, ID 1) ---
 const getAdminId = async () => {
     // In a real app, you would fetch all users WHERE is_admin = 1

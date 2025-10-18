@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+axios.defaults.withCredentials = true;
+
+
 // Get user profile
 router.get('/me', async (req, res) => {
     if (!req.session.user) {

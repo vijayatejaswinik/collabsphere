@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+axios.defaults.withCredentials = true;
+
 
 // Get unread notifications
 router.get('/', async (req, res) => {

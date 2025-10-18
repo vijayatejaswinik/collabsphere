@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
+axios.defaults.withCredentials = true;
+
+
 // Require login
 router.use((req, res, next) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
