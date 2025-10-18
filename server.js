@@ -19,6 +19,18 @@ app.get("/test", (req, res) => {
   res.send("✅ Backend is running fine!");
 });
 
+const pool = require("./db"); // or your MySQL connection file
+
+app.get("/test", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT NOW() AS time;");
+    res.send(`✅ Backend and DB working fine! Server time: ${rows[0].time}`);
+  } catch (err) {
+    res.status(500).send("❌ Database connection failed: " + err.message);
+  }
+});
+
+
 
 // ✅ Updated CORS (allows cookies + multi-origin local testing)
 app.use(cors({
