@@ -31,7 +31,7 @@
       const password = document.getElementById('password').value;
 
       try {
-        const res = await fetch('https://collabsphere-09q9.onrender.com/auth/login', {
+        const res = await fetch('api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include', // send cookies for session auth

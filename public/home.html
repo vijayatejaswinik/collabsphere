@@ -85,7 +85,7 @@
       // Logout
       logoutBtn.addEventListener('click', async () => {
         try {
-          await fetch(`${BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+          await fetch(`/auth/logout`, { method: 'POST', credentials: 'include' });
         } catch (err) {
           console.error('Logout API error:', err);
         }
@@ -98,7 +98,7 @@
       async function loadProjects() {
         projectsList.innerHTML = '<p>Loading projects…</p>';
         try {
-          const res = await fetch(`${BASE_URL}/api/projects/all`, { credentials: 'include' });
+          const res = await fetch(`/api/projects/all`, { credentials: 'include' });
           if (!res.ok) throw new Error('Failed to load projects');
           const projects = await res.json();
 
@@ -149,7 +149,7 @@
       // Apply to project
       async function apply(id) {
         try {
-          const res = await fetch(`${BASE_URL}/api/projects/apply`, {
+          const res = await fetch(`/api/projects/apply`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

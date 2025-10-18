@@ -33,7 +33,7 @@
 
     async function loadNotifications() {
       try {
-        const res = await fetch(`${BASE_URL}/api/notifications`, { credentials: 'include' });
+        const res = await fetch(`/api/notifications`, { credentials: 'include' });
         const data = await res.json();
 
         const container = document.getElementById('notifContainer');
@@ -79,7 +79,7 @@
       if (!confirm(`Are you sure you want to ${type} ${applicantName}?`)) return;
 
       try {
-        const res = await fetch(`${BASE_URL}/api/projects/${projectId}/applicants`, { credentials: 'include' });
+        const res = await fetch(`/api/projects/${projectId}/applicants`, { credentials: 'include' });
         const applicants = await res.json();
         const target = applicants.find(a => a.name === applicantName);
         if (!target) return alert('Applicant not found.');

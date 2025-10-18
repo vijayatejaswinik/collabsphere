@@ -43,7 +43,7 @@ document.getElementById('otpForm').addEventListener('submit', async (e) => {
   message.textContent = 'Verifying OTP...';
 
   try {
-    const res = await fetch('https://collabsphere-09q9.onrender.com/auth/verify-otp', {
+    const res = await fetch('api/auth/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, otp }),
@@ -68,7 +68,7 @@ resendBtn.addEventListener('click', async () => {
   message.textContent = 'Resending OTP...';
 
   try {
-    const res = await fetch('https://collabsphere-09q9.onrender.com/auth/register', {
+    const res = await fetch('api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'temp', email, password: 'temp' }),

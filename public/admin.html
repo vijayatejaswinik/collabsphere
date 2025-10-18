@@ -13,11 +13,11 @@
     </main>
 
     <script>
-        const BASE_URL = 'https://collabsphere-09q9.onrender.com';
+        
 
         async function loadPending() {
             try {
-                const res = await fetch(`${BASE_URL}/admin/projects`, {
+                const res = await fetch(`/api/admin/projects`, {
                     credentials: 'include'
                 });
                 if (!res.ok) throw new Error('Failed to load projects');
@@ -49,7 +49,7 @@
 
         async function approve(id) {
             try {
-                await fetch(`${BASE_URL}/admin/projects/approve`, {
+                await fetch(`/api/admin/projects/approve`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -63,7 +63,7 @@
 
         async function reject(id) {
             try {
-                await fetch(`${BASE_URL}/admin/projects/reject`, {
+                await fetch(`/api/admin/projects/reject`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',

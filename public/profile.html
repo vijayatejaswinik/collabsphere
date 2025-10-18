@@ -121,7 +121,7 @@ function updateDisplay(user) {
 
 async function loadProfile() {
   try {
-    const res = await fetch('https://collabsphere-09q9.onrender.com/api/profile/me', {
+    const res = await fetch('/api/profile/me', {
       credentials: 'include'
     });
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
@@ -155,7 +155,7 @@ profileForm.addEventListener('submit', async (e) => {
   };
 
   try {
-    const res = await fetch('https://collabsphere-09q9.onrender.com/api/profile/update', {
+    const res = await fetch('/api/profile/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),

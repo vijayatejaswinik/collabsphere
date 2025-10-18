@@ -1,89 +1,69 @@
-// server.js
+// server.js (final hosting setup)
 const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-axios.defaults.withCredentials = true;
+const path = require('path');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/projects');
-const adminRoutes = require('./routes/admin');
-const profileRoutes = require('./routes/profile');
-const notificationRoutes = require('./routes/notifications');
-const selectionRoutes = require('./routes/selection');
-
-const pool = require('./config/db'); // your MySQL connection file
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// ✅ Test route for backend + DB
-app.get("/test", async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT NOW() AS time;");
-    res.send(`✅ Backend and DB working fine! Server time: ${rows[0].time}`);
-  } catch (err) {
-    res.status(500).send("❌ Database connection failed: " + err.message);
-  }
-});
+// --- Middlewares ---
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ Step 2: CORS
+// --- CORS Setup ---
 app.use(cors({
   origin: [
-    'https://your-frontend-domain.vercel.app', // ⚠️ Replace with your frontend URL
-    'http://localhost:5500'                     // for local testing
+    'http://localhost:5500',                 // for local testing
+    'https://collabsphere-frontend.vercel.app', // if you host frontend separately later
   ],
   credentials: true
 }));
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static('public'));
-
-// ✅ Step 3: Session store (MySQL)
+// --- MySQL Session Store ---
 const sessionStore = new MySQLStore({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  clearExpired: true,
-  checkExpirationInterval: 900000, // 15 min
-  expiration: 86400000             // 24 hours
+  port: process.env.DB_PORT || 3306
 });
 
 app.use(session({
-  key: 'collabsphere.sid',
-  secret: process.env.SESSION_SECRET || 'collabsphere_secret',
+  key: 'user_session',
+  secret: process.env.SESSION_SECRET || 'secretkey',
   store: sessionStore,
   resave: false,
   saveUninitialized: false,
   cookie: {
+    secure: true,      // ✅ Render uses HTTPS
     httpOnly: true,
-    sameSite: 'none',    // allows cross-site cookies
-    secure: true,        // HTTPS required
-    maxAge: 24 * 60 * 60 * 1000
+    sameSite: 'none'   // ✅ allows cookies across domains
   }
 }));
 
-// ✅ Step 4: Routes
-app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
+// --- Serve static frontend files ---
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Routes ---
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+const projectRoutes = require('./routes/projects');
+const profileRoutes = require('./routes/profile');
+const notificationRoutes = require('./routes/notifications');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/selection', selectionRoutes);
 
-// ✅ Optional: Debug session route
-app.get('/check-session', (req, res) => {
-  if (req.session.user) {
-    res.json({ loggedIn: true, user: req.session.user });
-  } else {
-    res.json({ loggedIn: false });
-  }
+// --- Fallback for SPA/HTML pages ---
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// --- Start server ---
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

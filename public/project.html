@@ -96,7 +96,7 @@
       return;
     }
     
-    const res = await fetch(`${API_BASE}/api/projects/${projectId}`, { credentials: 'include' });
+    const res = await fetch(`/api/projects/${projectId}`, { credentials: 'include' });
     const data = await res.json();
     
     if (!res.ok) {
@@ -143,7 +143,7 @@
 
   // Load logged-in user
   async function loadCurrentUser(ownerId) {
-    const res = await fetch(`${API_BASE}/api/profile/me`, { credentials: 'include' });
+    const res = await fetch(`/api/profile/me`, { credentials: 'include' });
     if (res.ok) {
       const user = await res.json();
       currentUserId = user.id;
@@ -219,7 +219,7 @@
 
   // Applicants
   async function loadApplicants(projectId) {
-    const res = await fetch(`${API_BASE}/api/projects/${projectId}/applicants`, { credentials: 'include' });
+    const res = await fetch(`/api/projects/${projectId}/applicants`, { credentials: 'include' });
     if (!res.ok) {
       document.getElementById('applicantsList').innerHTML = '<p style="color:red;">Error loading applicants.</p>';
       return;
@@ -252,7 +252,7 @@
   async function handleApply() {
     if (!currentUserId) return alert("You must be logged in to apply.");
     if (!confirm("Apply for this project?")) return;
-    const res = await fetch(`${API_BASE}/api/projects/${projectId}/apply`, {
+    const res = await fetch(`/api/projects/${projectId}/apply`, {
       method: 'POST', credentials: 'include'
     });
     const data = await res.json();
@@ -264,7 +264,7 @@
   async function handleSelection(projectId, applicantId, action) {
     const endpoint = action === 'select' ? '/api/selection/select' : '/api/selection/reject-applicant';
     if (!confirm(`Confirm ${action}?`)) return;
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    const res = await fetch(`${endpoint}`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       credentials: 'include',
@@ -278,7 +278,7 @@
   // Close applications
   async function handleCloseApplication() {
     if (!confirm("Close applications for this project?")) return;
-    const res = await fetch(`${API_BASE}/api/projects/${projectId}/close`, {
+    const res = await fetch(`/api/projects/${projectId}/close`, {
       method: 'POST', credentials: 'include'
     });
     const data = await res.json();
@@ -297,7 +297,7 @@
     e.preventDefault();
     const message = document.getElementById('fbMessage').value.trim();
     if (!message) return alert('Feedback message required.');
-    const res = await fetch(`${API_BASE}/api/projects/${projectId}/feedback`, {
+    const res = await fetch(`/api/projects/${projectId}/feedback`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',

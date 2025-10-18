@@ -150,7 +150,7 @@
       };
 
       try {
-        const res = await fetch(`${BASE_URL}/api/projects/create`, {
+        const res = await fetch(`/api/projects/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -175,7 +175,7 @@
     async function loadMyProjects() {
       listContainer.innerHTML = '<p>Loading your projects...</p>';
       try {
-        const res = await fetch(`${BASE_URL}/api/projects/all`, {
+        const res = await fetch(`/api/projects/all`, {
           credentials: 'include'
         });
         if (!res.ok) throw new Error('Failed to load projects');
@@ -227,7 +227,7 @@
       if (!confirm('Are you sure you want to stop receiving applications for this project?')) return;
 
       try {
-        const res = await fetch(`${BASE_URL}/api/projects/${id}/close`, {
+        const res = await fetch(`/api/projects/${id}/close`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
