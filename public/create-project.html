@@ -79,7 +79,7 @@
   </aside>
 
   <main>
-    <h2>Welcome to Collabsphere!</h2>
+    <h2>Explore the Projects!</h2>
     <button id="createProjectBtn" class="add-btn">+ Create Project</button>
 
     <div id="createProjectForm" class="hidden">
@@ -100,6 +100,8 @@
   </main>
 
   <script>
+    const BASE_URL = 'https://collabsphere-09q9.onrender.com';
+
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
     const adminLink = document.getElementById('adminLink');
@@ -148,9 +150,10 @@
       };
 
       try {
-        const res = await fetch('/api/projects/create', {
+        const res = await fetch(`${BASE_URL}/api/projects/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(data)
         });
 
@@ -172,7 +175,9 @@
     async function loadMyProjects() {
       listContainer.innerHTML = '<p>Loading your projects...</p>';
       try {
-        const res = await fetch('/api/projects/all');
+        const res = await fetch(`${BASE_URL}/api/projects/all`, {
+          credentials: 'include'
+        });
         if (!res.ok) throw new Error('Failed to load projects');
         const projects = await res.json();
 
@@ -197,11 +202,10 @@
             <h3><a href="project.html?id=${p.id}">${p.title}</a> ${statusChip}</h3>
             <p>${p.description}</p>
             <p>
-  Owner: ${p.owner_name || 'You'}<br>
-  Contact: ${p.owner_email || 'N/A'}${p.owner_whatsapp ? ' | WhatsApp: ' + p.owner_whatsapp : ''}<br>
-  ${deadlineText} | ${amountText}
-</p>
-
+              Owner: ${p.owner_name || 'You'}<br>
+              Contact: ${p.owner_email || 'N/A'}${p.owner_whatsapp ? ' | WhatsApp: ' + p.owner_whatsapp : ''}<br>
+              ${deadlineText} | ${amountText}
+            </p>
             <button onclick="window.location.href='project.html?id=${p.id}'">View & Apply</button>
             ${
               p.status === 'approved'
@@ -223,9 +227,10 @@
       if (!confirm('Are you sure you want to stop receiving applications for this project?')) return;
 
       try {
-        const res = await fetch(`/api/projects/${id}/close`, {
+        const res = await fetch(`${BASE_URL}/api/projects/${id}/close`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
         });
 
         const json = await res.json();
@@ -243,4 +248,4 @@
     loadMyProjects();
   </script>
 </body>
-</html> 
+</html>

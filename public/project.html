@@ -1,345 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Project — Collabsphere</title>
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    .project-header { display:flex; justify-content:space-between; gap:16px; align-items:center; }
-    .meta small { color:#666; }
-    .applicants { margin-top:12px; }
-    .feedback-list { margin-top:18px; }
-    .chip { display:inline-block; padding:6px 10px; border-radius:999px; background:#eef6ff; margin-right:6px; margin-bottom:5px; }
+  <meta charset="utf-8">
+  <title>Project — Collabsphere</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .project-header { display:flex; justify-content:space-between; gap:16px; align-items:center; }
+    .meta small { color:#666; }
+    .applicants { margin-top:12px; }
+    .feedback-list { margin-top:18px; }
+    .chip { display:inline-block; padding:6px 10px; border-radius:999px; background:#eef6ff; margin-right:6px; margin-bottom:5px; }
     .applicant-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;}
     .applicant-item:last-child { border-bottom: none; }
     .owner-actions button { margin-left: 5px; }
     .applicant-details { font-size: 0.9em; color: #555; margin-top: 5px; }
-  </style>
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="brand">Collabsphere</div>
-    <nav class="nav-links">
-      <a href="home.html">Home</a>
-      <a href="profile.html">Profile</a>
-    </nav>
-  </header>
+  <header class="header">
+    <div class="brand">Collabsphere</div>
+    <nav class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </header>
 
-  <main class="container">
-    <div class="main">
-      <div class="card" id="projectCard">
-        <div class="project-header">
-          <div>
-            <h2 id="title">Loading...</h2>
-            <div class="meta"><small id="owner">—</small></div>
-          </div>
-          <div>
-            <button id="closeAppBtn" class="danger" style="display:none;">Close Applications</button>
-            <button id="applyBtn" class="primary">Apply to this Project</button>
-            <button id="shareBtn" class="ghost">Share</button>
-          </div>
-        </div>
+  <main class="container">
+    <div class="main">
+      <div class="card" id="projectCard">
+        <div class="project-header">
+          <div>
+            <h2 id="title">Loading...</h2>
+            <div class="meta"><small id="owner">—</small></div>
+          </div>
+          <div>
+            <button id="closeAppBtn" class="danger" style="display:none;">Close Applications</button>
+            <button id="applyBtn" class="primary">Apply to this Project</button>
+            <button id="shareBtn" class="ghost">Share</button>
+          </div>
+        </div>
 
-        <hr>
+        <hr>
 
-        <div id="description">Loading description...</div>
+        <div id="description">Loading description...</div>
         
         <div class="selected-members card" id="membersCard" style="display:none; margin-top: 15px;">
-          <h4>Selected Members</h4>
-          <div id="membersList"></div>
-        </div>
+          <h4>Selected Members</h4>
+          <div id="membersList"></div>
+        </div>
 
-        <div class="applicants card" id="applicantsCard" style="display:none;">
-          <h4>Applicants (<span id="applicantCount">0</span>)</h4>
-          <div id="applicantsList"></div>
-        </div>
+        <div class="applicants card" id="applicantsCard" style="display:none;">
+          <h4>Applicants (<span id="applicantCount">0</span>)</h4>
+          <div id="applicantsList"></div>
+        </div>
 
-        <div class="feedback-list card">
-          <h4>Feedback</h4>
-          <div id="feedbackList"></div>
+        <div class="feedback-list card">
+          <h4>Feedback</h4>
+          <div id="feedbackList"></div>
 
-          <form id="feedbackForm" style="margin-top:12px;">
-            <textarea name="message" id="fbMessage" placeholder="Write feedback..." rows="3" style="width:100%;"></textarea>
-            <button class="primary" type="submit">Send Feedback</button>
-          </form>
-        </div>
+          <form id="feedbackForm" style="margin-top:12px;">
+            <textarea name="message" id="fbMessage" placeholder="Write feedback..." rows="3" style="width:100%;"></textarea>
+            <button class="primary" type="submit">Send Feedback</button>
+          </form>
+        </div>
+      </div>
+    </div>
 
-      </div>
-    </div>
-
-    <aside class="sidebar">
-      <div class="card">
-        <h4>Project Info</h4>
-        <p><span class="chip">Status:</span> <span id="statusChip">—</span></p>
-        <p><span class="chip">Required:</span> <span id="slots">—</span></p>
+    <aside class="sidebar">
+      <div class="card">
+        <h4>Project Info</h4>
+        <p><span class="chip">Status:</span> <span id="statusChip">—</span></p>
+        <p><span class="chip">Required:</span> <span id="slots">—</span></p>
         <p><span class="chip">Deadline:</span> <span id="deadlineInfo">—</span></p>
         <p><span class="chip">Amount:</span> <span id="amountInfo">—</span></p>
-        <p><span class="chip">Applicants:</span> <span id="appCount">—</span></p>
-      </div>
-    </aside>
-  </main>
+        <p><span class="chip">Applicants:</span> <span id="appCount">—</span></p>
+      </div>
+    </aside>
+  </main>
+
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectId = urlParams.get('id');
-    const applyBtn = document.getElementById('applyBtn');
-    const shareBtn = document.getElementById('shareBtn');
-    const closeAppBtn = document.getElementById('closeAppBtn');
-    const feedbackForm = document.getElementById('feedbackForm');
-    let currentProjectOwnerId = null;
-    let currentUserId = null;
+  const API_BASE = "https://collabsphere-09q9.onrender.com";
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = urlParams.get('id');
+  const applyBtn = document.getElementById('applyBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const closeAppBtn = document.getElementById('closeAppBtn');
+  const feedbackForm = document.getElementById('feedbackForm');
+  let currentProjectOwnerId = null;
+  let currentUserId = null;
 
-
-    // Load Project Data
-    async function loadProject() {
-        if (!projectId) {
-            document.getElementById('title').textContent = 'Error: No Project ID specified';
-            return;
-        }
-        
-        const res = await fetch(`/api/projects/${projectId}`);
-        const data = await res.json();
-        
-        if (!res.ok) {
-            document.getElementById('title').textContent = data.error || 'Project not found';
-            return;
-        }
-
-        const project = data.project;
-        
-        document.getElementById('title').textContent = project.title;
-        document.getElementById('owner').textContent = `Owner: ${project.owner_name}`;
-        document.getElementById('description').innerHTML = project.description.replace(/\n/g, '<br>');
-        
-        // Populate sidebar info
-        document.getElementById('statusChip').textContent = project.status;
-        document.getElementById('slots').textContent = project.required_people;
-        document.getElementById('appCount').textContent = data.applicantsCount;
-        document.getElementById('deadlineInfo').textContent = project.deadline ? new Date(project.deadline).toLocaleDateString() : 'N/A';
-        document.getElementById('amountInfo').textContent = `$${Number(project.amount).toFixed(2)}`;
-        
-        currentProjectOwnerId = project.user_id;
-
-        // Load logged-in user details to check ownership
-        const user = await loadCurrentUser(project.user_id);
-        
-        // Apply Button Logic
-        updateApplyButton(project.status, data.myApplicationStatus);
-
-        // Display selected members (visible to selected members and owner)
-        displaySelectedMembers(data.selectedMembers);
-
-        // Load Applicants (Only visible to project owner/admin)
-        if (user && (user.id === project.user_id || user.is_admin === 1)) {
-            loadApplicants(project.id);
-            if (user.id === project.user_id && project.status === 'approved') {
-                 closeAppBtn.style.display = 'inline-block';
-                 closeAppBtn.onclick = handleCloseApplication;
-            }
-        }
-
-        // Load Feedback
-        displayFeedback(data.feedbacks);
+  // Load Project Data
+  async function loadProject() {
+    if (!projectId) {
+      document.getElementById('title').textContent = 'Error: No Project ID specified';
+      return;
     }
     
-    // Load logged-in user and check ownership
-    async function loadCurrentUser(ownerId) {
-        const res = await fetch('/api/profile/me');
-        if (res.ok) {
-            const user = await res.json();
-            currentUserId = user.id;
-            // If current user is the owner, show owner-specific cards
-            if (currentUserId === ownerId || user.is_admin === 1) {
-                document.getElementById('applicantsCard').style.display = 'block';
-                document.getElementById('membersCard').style.display = 'block';
-            }
-            return user;
-        }
-        return null;
-    }
-
-    // Update Apply Button State
-    function updateApplyButton(projectStatus, myApplicationStatus) {
-        applyBtn.style.display = 'none'; // Hide by default
-
-        if (projectStatus !== 'approved') {
-            applyBtn.textContent = 'Applications Closed';
-            applyBtn.disabled = true;
-            applyBtn.style.display = 'inline-block';
-            applyBtn.style.backgroundColor = 'grey';
-            return;
-        }
-
-        applyBtn.style.display = 'inline-block';
-
-        if (!myApplicationStatus) {
-            applyBtn.textContent = 'Apply to this Project';
-            applyBtn.onclick = handleApply;
-            applyBtn.disabled = false;
-            applyBtn.style.backgroundColor = ''; // Use default style
-        } else if (myApplicationStatus === 'applied') {
-            applyBtn.textContent = 'Application Pending';
-            applyBtn.disabled = true;
-            applyBtn.style.backgroundColor = 'orange';
-        } else if (myApplicationStatus === 'accepted') {
-            applyBtn.textContent = '🎉 You are Selected! Contact Owner for further information';
-            applyBtn.disabled = true;
-            applyBtn.style.backgroundColor = 'green';
-        } else if (myApplicationStatus === 'rejected') {
-            applyBtn.textContent = 'Application Rejected';
-            applyBtn.disabled = true;
-            applyBtn.style.backgroundColor = 'red';
-        }
-    }
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}`, { credentials: 'include' });
+    const data = await res.json();
     
-    // Display Feedback
-    function displayFeedback(feedbacks) {
-        const list = document.getElementById('feedbackList');
-        list.innerHTML = '';
-        if (feedbacks.length === 0) {
-            list.innerHTML = '<p>No feedback yet. Be the first!</p>';
-            return;
-        }
-        feedbacks.forEach(f => {
-            const div = document.createElement('div');
-            div.innerHTML = `<p><strong>${f.from_name}:</strong> ${f.message}</p><small>${new Date(f.created_at).toLocaleString()}</small><hr>`;
-            list.appendChild(div);
-        });
+    if (!res.ok) {
+      document.getElementById('title').textContent = data.error || 'Project not found';
+      return;
     }
 
-    // Display Selected Members
-    function displaySelectedMembers(members) {
-        const list = document.getElementById('membersList');
-        list.innerHTML = '';
-        if (members.length === 0) {
-            list.innerHTML = '<p>No members selected yet.</p>';
-            return;
-        }
-        members.forEach(m => {
-            const p = document.createElement('div');
-            p.innerHTML = `<p><strong>${m.name}</strong> (${m.email})</p>`;
-            list.appendChild(p);
-        });
-    }
-
-    // Load and Display Applicants (Owner view)
-    async function loadApplicants(projectId) {
-        const res = await fetch(`/api/projects/${projectId}/applicants`);
-        if (!res.ok) {
-            document.getElementById('applicantsList').innerHTML = '<p style="color:red;">Error loading applicants.</p>';
-            return;
-        }
-        
-        const data = await res.json();
-        const list = document.getElementById('applicantsList');
-        document.getElementById('applicantCount').textContent = data.applicants.length;
-        list.innerHTML = '';
-
-        data.applicants.forEach(app => {
-            const div = document.createElement('div');
-            div.className = 'applicant-item';
-            div.innerHTML = `
-                <div>
-                    <strong>${app.applicant_name}</strong> (${app.applicant_email}) - Status: ${app.status}
-                    <div class="applicant-details">
-                        ${app.bio ? `Bio: ${app.bio}<br>` : ''}
-                        ${app.whatsapp ? `WhatsApp: ${app.whatsapp}<br>` : ''}
-                        ${app.portfolio ? `<a href="${app.portfolio}" target="_blank">Portfolio</a>` : ''}
-                    </div>
-                </div>
-                <div class="owner-actions">
-                    <button class="primary" onclick="handleSelection(${projectId}, ${app.user_id}, 'select')">Select</button>
-                    <button onclick="handleSelection(${projectId}, ${app.user_id}, 'reject')">Reject</button>
-                </div>
-            `;
-            list.appendChild(div);
-        });
-    }
-
-
-    // --- Event Handlers ---
-
-    // Handle Apply button click
-    async function handleApply() {
-        if (!currentUserId) {
-            alert("You must be logged in to apply for a project.");
-            return;
-        }
-        
-        if (confirm("Are you sure you want to apply for this project?")) {
-            const res = await fetch(`/api/projects/${projectId}/apply`, { method: 'POST' });
-            const data = await res.json();
-            alert(data.message);
-            if (res.ok) {
-                loadProject(); 
-            }
-        }
-    }
+    const project = data.project;
     
-    // Handle Owner Selection/Rejection
-    async function handleSelection(projectId, applicantId, action) {
-        const endpoint = action === 'select' ? '/api/selection/select' : '/api/selection/reject-applicant';
-        
-        if (!confirm(`Confirm ${action} for this applicant?`)) return;
-
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ projectId, applicantId })
-        });
-
-        const data = await res.json();
-        alert(data.message);
-        
-        if (res.ok) {
-            loadProject();
-        }
-    }
+    document.getElementById('title').textContent = project.title;
+    document.getElementById('owner').textContent = `Owner: ${project.owner_name}`;
+    document.getElementById('description').innerHTML = project.description.replace(/\n/g, '<br>');
     
-    // Handle Owner Close Application
-    async function handleCloseApplication() {
-        if (!confirm("Are you sure you want to manually close applications for this project?")) return;
-        
-        const res = await fetch(`/api/projects/${projectId}/close`, { method: 'POST' });
-        const data = await res.json();
-        alert(data.message);
+    // Sidebar info
+    document.getElementById('statusChip').textContent = project.status;
+    document.getElementById('slots').textContent = project.required_people;
+    document.getElementById('appCount').textContent = data.applicantsCount;
+    document.getElementById('deadlineInfo').textContent = project.deadline ? new Date(project.deadline).toLocaleDateString() : 'N/A';
+    document.getElementById('amountInfo').textContent = `$${Number(project.amount).toFixed(2)}`;
+    
+    currentProjectOwnerId = project.user_id;
 
-        if (res.ok) {
-            loadProject();
-        }
+    // Logged-in user
+    const user = await loadCurrentUser(project.user_id);
+    
+    // Apply button logic
+    updateApplyButton(project.status, data.myApplicationStatus);
+
+    // Selected members
+    displaySelectedMembers(data.selectedMembers);
+
+    // Applicants (for owner/admin)
+    if (user && (user.id === project.user_id || user.is_admin === 1)) {
+      loadApplicants(project.id);
+      if (user.id === project.user_id && project.status === 'approved') {
+        closeAppBtn.style.display = 'inline-block';
+        closeAppBtn.onclick = handleCloseApplication;
+      }
     }
 
+    // Feedback
+    displayFeedback(data.feedbacks);
+  }
 
-    // Share button
-    shareBtn.addEventListener('click', () => {
-        const url = window.location.href;
-        navigator.clipboard.writeText(url);
-        alert('Project link copied to clipboard!');
+  // Load logged-in user
+  async function loadCurrentUser(ownerId) {
+    const res = await fetch(`${API_BASE}/api/profile/me`, { credentials: 'include' });
+    if (res.ok) {
+      const user = await res.json();
+      currentUserId = user.id;
+      if (currentUserId === ownerId || user.is_admin === 1) {
+        document.getElementById('applicantsCard').style.display = 'block';
+        document.getElementById('membersCard').style.display = 'block';
+      }
+      return user;
+    }
+    return null;
+  }
+
+  // Apply button states
+  function updateApplyButton(projectStatus, myApplicationStatus) {
+    applyBtn.style.display = 'none';
+    if (projectStatus !== 'approved') {
+      applyBtn.textContent = 'Applications Closed';
+      applyBtn.disabled = true;
+      applyBtn.style.display = 'inline-block';
+      applyBtn.style.backgroundColor = 'grey';
+      return;
+    }
+
+    applyBtn.style.display = 'inline-block';
+    if (!myApplicationStatus) {
+      applyBtn.textContent = 'Apply to this Project';
+      applyBtn.onclick = handleApply;
+      applyBtn.disabled = false;
+    } else if (myApplicationStatus === 'applied') {
+      applyBtn.textContent = 'Application Pending';
+      applyBtn.disabled = true;
+      applyBtn.style.backgroundColor = 'orange';
+    } else if (myApplicationStatus === 'accepted') {
+      applyBtn.textContent = '🎉 You are Selected!';
+      applyBtn.disabled = true;
+      applyBtn.style.backgroundColor = 'green';
+    } else if (myApplicationStatus === 'rejected') {
+      applyBtn.textContent = 'Application Rejected';
+      applyBtn.disabled = true;
+      applyBtn.style.backgroundColor = 'red';
+    }
+  }
+
+  // Feedback display
+  function displayFeedback(feedbacks) {
+    const list = document.getElementById('feedbackList');
+    list.innerHTML = '';
+    if (feedbacks.length === 0) {
+      list.innerHTML = '<p>No feedback yet.</p>';
+      return;
+    }
+    feedbacks.forEach(f => {
+      const div = document.createElement('div');
+      div.innerHTML = `<p><strong>${f.from_name}:</strong> ${f.message}</p><small>${new Date(f.created_at).toLocaleString()}</small><hr>`;
+      list.appendChild(div);
     });
+  }
 
-    // Feedback submission
-    feedbackForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const message = document.getElementById('fbMessage').value;
-        if (!message) {
-            alert('Feedback message required.');
-            return;
-        }
-        
-        const res = await fetch(`/api/projects/${projectId}/feedback`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
-        });
-
-        const data = await res.json();
-        alert(data.message);
-        if (res.ok) {
-            document.getElementById('fbMessage').value = '';
-            loadProject();
-        }
+  // Selected members
+  function displaySelectedMembers(members) {
+    const list = document.getElementById('membersList');
+    list.innerHTML = '';
+    if (members.length === 0) {
+      list.innerHTML = '<p>No members selected yet.</p>';
+      return;
+    }
+    members.forEach(m => {
+      const p = document.createElement('div');
+      p.innerHTML = `<p><strong>${m.name}</strong> (${m.email})</p>`;
+      list.appendChild(p);
     });
+  }
 
-    loadProject();
+  // Applicants
+  async function loadApplicants(projectId) {
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}/applicants`, { credentials: 'include' });
+    if (!res.ok) {
+      document.getElementById('applicantsList').innerHTML = '<p style="color:red;">Error loading applicants.</p>';
+      return;
+    }
+    const data = await res.json();
+    const list = document.getElementById('applicantsList');
+    document.getElementById('applicantCount').textContent = data.applicants.length;
+    list.innerHTML = '';
+    data.applicants.forEach(app => {
+      const div = document.createElement('div');
+      div.className = 'applicant-item';
+      div.innerHTML = `
+        <div>
+          <strong>${app.applicant_name}</strong> (${app.applicant_email}) - Status: ${app.status}
+          <div class="applicant-details">
+            ${app.bio ? `Bio: ${app.bio}<br>` : ''}
+            ${app.whatsapp ? `WhatsApp: ${app.whatsapp}<br>` : ''}
+            ${app.portfolio ? `<a href="${app.portfolio}" target="_blank">Portfolio</a>` : ''}
+          </div>
+        </div>
+        <div class="owner-actions">
+          <button class="primary" onclick="handleSelection(${projectId}, ${app.user_id}, 'select')">Select</button>
+          <button onclick="handleSelection(${projectId}, ${app.user_id}, 'reject')">Reject</button>
+        </div>`;
+      list.appendChild(div);
+    });
+  }
+
+  // Apply
+  async function handleApply() {
+    if (!currentUserId) return alert("You must be logged in to apply.");
+    if (!confirm("Apply for this project?")) return;
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}/apply`, {
+      method: 'POST', credentials: 'include'
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (res.ok) loadProject();
+  }
+
+  // Owner actions
+  async function handleSelection(projectId, applicantId, action) {
+    const endpoint = action === 'select' ? '/api/selection/select' : '/api/selection/reject-applicant';
+    if (!confirm(`Confirm ${action}?`)) return;
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({ projectId, applicantId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (res.ok) loadProject();
+  }
+
+  // Close applications
+  async function handleCloseApplication() {
+    if (!confirm("Close applications for this project?")) return;
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}/close`, {
+      method: 'POST', credentials: 'include'
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (res.ok) loadProject();
+  }
+
+  // Share
+  shareBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Project link copied!');
+  });
+
+  // Feedback
+  feedbackForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = document.getElementById('fbMessage').value.trim();
+    if (!message) return alert('Feedback message required.');
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}/feedback`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (res.ok) {
+      document.getElementById('fbMessage').value = '';
+      loadProject();
+    }
+  });
+
+  loadProject();
 </script>
 </body>
 </html>

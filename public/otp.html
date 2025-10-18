@@ -23,68 +23,65 @@
   </main>
 
   <script>
-    const userEmail = document.getElementById('userEmail');
-    const userId = sessionStorage.getItem('userId');
-    const email = sessionStorage.getItem('email');
-    const message = document.getElementById('message');
-    const resendBtn = document.getElementById('resendBtn');
+const userEmail = document.getElementById('userEmail');
+const userId = sessionStorage.getItem('userId');
+const email = sessionStorage.getItem('email');
+const message = document.getElementById('message');
+const resendBtn = document.getElementById('resendBtn');
 
-    userEmail.textContent = email || '';
+userEmail.textContent = email || '';
 
-    if (!userId) {
-      alert('No user found. Please register again.');
-      window.location.href = 'register.html';
+if (!userId) {
+  alert('No user found. Please register again.');
+  window.location.href = 'register.html';
+}
+
+// ✅ Verify OTP
+document.getElementById('otpForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const otp = document.getElementById('otp').value.trim();
+  message.textContent = 'Verifying OTP...';
+
+  try {
+    const res = await fetch('https://collabsphere-09q9.onrender.com/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, otp }),
+      credentials: 'include'
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      message.textContent = '✅ OTP verified successfully!';
+      setTimeout(() => (window.location.href = 'login.html'), 1500);
+    } else {
+      message.textContent = data.error || 'Invalid OTP.';
     }
+  } catch (err) {
+    console.error(err);
+    message.textContent = 'Error verifying OTP.';
+  }
+});
 
-    // ✅ OTP Verification
-    document.getElementById('otpForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const otp = document.getElementById('otp').value.trim();
-      message.textContent = 'Verifying OTP...';
+// ✅ Resend OTP
+resendBtn.addEventListener('click', async () => {
+  message.textContent = 'Resending OTP...';
 
-      try {
-        const res = await fetch('/auth/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, otp })
-        });
-
-        const data = await res.json();
-        if (data.ok) {
-          message.textContent = '✅ OTP verified successfully!';
-          setTimeout(() => {
-            window.location.href = 'login.html';
-          }, 1500);
-        } else {
-          message.textContent = data.error || 'Invalid OTP.';
-        }
-      } catch (err) {
-        console.error(err);
-        message.textContent = 'Error verifying OTP.';
-      }
+  try {
+    const res = await fetch('https://collabsphere-09q9.onrender.com/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'temp', email, password: 'temp' }),
+      credentials: 'include'
     });
+    const data = await res.json();
+    message.textContent = data.ok ? 'New OTP sent to your email.' : 'Failed to resend OTP.';
+  } catch (err) {
+    console.error(err);
+    message.textContent = 'Error sending new OTP.';
+  }
+});
+</script>
 
-    // ✅ Resend OTP handler
-    resendBtn.addEventListener('click', async () => {
-      message.textContent = 'Resending OTP...';
-
-      try {
-        const res = await fetch('/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: 'temp', email, password: 'temp' })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          message.textContent = 'New OTP sent to your email.';
-        } else {
-          message.textContent = 'Failed to resend OTP.';
-        }
-      } catch (err) {
-        console.error(err);
-        message.textContent = 'Error sending new OTP.';
-      }
-    });
-  </script>
 </body>
 </html>

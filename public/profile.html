@@ -106,97 +106,79 @@
     </main>
 
     <script>
-        const profileForm = document.getElementById('profileForm');
-        const message = document.getElementById('message');
+const profileForm = document.getElementById('profileForm');
+const message = document.getElementById('message');
 
-        // Helper function to update the display fields
-        function updateDisplay(user) {
-            // Function to safely get text content or use 'Not set'
-            const getText = (value) => value || 'Not set';
+function updateDisplay(user) {
+  const getText = (v) => v || 'Not set';
+  document.getElementById('display-name').textContent = getText(user.name);
+  document.getElementById('display-bio').textContent = getText(user.bio);
+  document.getElementById('display-whatsapp').textContent = getText(user.whatsapp);
+  document.getElementById('display-gender').textContent = getText(user.gender);
+  document.getElementById('display-age').textContent = getText(user.age);
+  document.getElementById('display-portfolio').textContent = getText(user.portfolio);
+}
 
-            // Populate the display section
-            document.getElementById('display-name').textContent = getText(user.name);
-            document.getElementById('display-bio').textContent = getText(user.bio);
-            document.getElementById('display-whatsapp').textContent = getText(user.whatsapp);
-            document.getElementById('display-gender').textContent = getText(user.gender);
-            document.getElementById('display-age').textContent = getText(user.age);
-            document.getElementById('display-portfolio').textContent = getText(user.portfolio);
-        }
+async function loadProfile() {
+  try {
+    const res = await fetch('https://collabsphere-09q9.onrender.com/api/profile/me', {
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error(`Failed: ${res.status}`);
+    const user = await res.json();
+    document.getElementById('name').value = user.name || '';
+    document.getElementById('bio').value = user.bio || '';
+    document.getElementById('whatsapp').value = user.whatsapp || '';
+    document.getElementById('gender').value = user.gender || '';
+    document.getElementById('age').value = user.age || '';
+    document.getElementById('portfolio').value = user.portfolio || '';
+    updateDisplay(user);
+  } catch (err) {
+    console.error('Error loading profile:', err);
+    message.textContent = '❌ Could not load profile. Please ensure you are logged in.';
+    message.style.color = 'red';
+  }
+}
 
-        // Function to load and display profile data
-        async function loadProfile() {
-            try {
-                const res = await fetch('/api/profile/me');
-                if (!res.ok) {
-                    throw new Error(`Failed to load profile: ${res.status}`);
-                }
-                const user = await res.json();
-                
-                // 1. Populate the form fields
-                document.getElementById('name').value = user.name || '';
-                document.getElementById('bio').value = user.bio || '';
-                document.getElementById('whatsapp').value = user.whatsapp || '';
-                document.getElementById('gender').value = user.gender || '';
-                document.getElementById('age').value = user.age || '';
-                document.getElementById('portfolio').value = user.portfolio || '';
+profileForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  message.textContent = 'Saving...';
+  message.style.color = 'orange';
 
-                // 2. Populate the display section
-                updateDisplay(user);
+  const userData = {
+    name: name.value,
+    bio: bio.value,
+    whatsapp: whatsapp.value,
+    gender: gender.value,
+    age: age.value,
+    portfolio: portfolio.value
+  };
 
-            } catch (err) {
-                console.error('Error loading profile:', err);
-                message.textContent = '❌ Could not load profile. Please ensure you are logged in.';
-                message.style.color = 'red';
-            }
-        }
+  try {
+    const res = await fetch('https://collabsphere-09q9.onrender.com/api/profile/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if (res.ok) {
+      message.textContent = '✅ Profile updated successfully!';
+      message.style.color = 'green';
+      updateDisplay(userData);
+    } else {
+      message.textContent = data.error || '❌ Failed to update profile.';
+      message.style.color = 'red';
+    }
+  } catch (err) {
+    console.error('Update error:', err);
+    message.textContent = '❌ Network error while saving.';
+    message.style.color = 'red';
+  }
+});
 
-        // Event listener for form submission (Save)
-        profileForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            message.textContent = 'Saving...';
-            message.style.color = 'orange';
+loadProfile();
+</script>
 
-            const name = document.getElementById('name').value;
-            const bio = document.getElementById('bio').value;
-            const whatsapp = document.getElementById('whatsapp').value;
-            const gender = document.getElementById('gender').value;
-            const age = document.getElementById('age').value;
-            const portfolio = document.getElementById('portfolio').value;
-            
-            const userData = { name, bio, whatsapp, gender, age, portfolio };
-
-            try {
-                const res = await fetch('/api/profile/update', {
-                    method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify(userData)
-                });
-
-                const data = await res.json();
-                
-                if (res.ok) {
-                    // 🎉 SUCCESS: Show green message and refresh display
-                    message.textContent = '✅ Profile updated successfully!';
-                    message.style.color = 'green';
-                    
-                    // Directly update the display section with the data that was sent
-                    // This is faster than calling loadProfile() again
-                    updateDisplay(userData);
-                    
-                } else {
-                    // ERROR: Show red message
-                    message.textContent = data.error || '❌ Failed to update profile.';
-                    message.style.color = 'red';
-                }
-            } catch (error) {
-                console.error('Update error:', error);
-                message.textContent = '❌ A network error occurred while saving.';
-                message.style.color = 'red';
-            }
-        });
-
-        // Load profile data when the page loads
-        loadProfile();
-    </script>
 </body>
 </html>

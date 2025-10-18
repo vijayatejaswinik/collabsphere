@@ -1,47 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login - Collabsphere</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>Login - Collabsphere</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <h1>Login</h1>
-    </header>
+  <header>
+    <h1>Login</h1>
+  </header>
 
-    <main>
-        <form id="loginForm">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-        <p id="message"></p>
-    </main>
+  <main>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p id="message"></p>
+  </main>
 
-    <script>
-        const form = document.getElementById('loginForm');
-        const message = document.getElementById('message');
+  <script>
+    const form = document.getElementById('loginForm');
+    const message = document.getElementById('message');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-            const res = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await res.json();
-            if(data.ok){
-                sessionStorage.setItem('isAdmin', data.isAdmin);
-                window.location.href = 'home.html';
-            } else {
-                message.textContent = data.error;
-            }
+      try {
+        const res = await fetch('https://collabsphere-09q9.onrender.com/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // send cookies for session auth
+          body: JSON.stringify({ email, password })
         });
-    </script>
+
+        const data = await res.json();
+        if (data.ok) {
+          sessionStorage.setItem('isAdmin', data.isAdmin);
+          window.location.href = 'home.html';
+        } else {
+          message.textContent = data.error || 'Invalid credentials.';
+        }
+      } catch (err) {
+        console.error('Login failed:', err);
+        message.textContent = 'Server unreachable. Try again later.';
+      }
+    });
+  </script>
 </body>
 </html>

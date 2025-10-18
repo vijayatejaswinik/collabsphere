@@ -29,11 +29,14 @@ app.get("/test", async (req, res) => {
 
 
 
-// ✅ Updated CORS (allows cookies + multi-origin local testing)
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500'],
+  origin: [
+    'https://collabsphere-09q9.onrender.com', // since frontend is same domain
+    'http://localhost:5500'
+  ],
   credentials: true
 }));
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
