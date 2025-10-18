@@ -15,9 +15,6 @@ const selectionRoutes = require('./routes/selection');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get("/test", (req, res) => {
-  res.send("✅ Backend is running fine!");
-});
 
 const pool = require("./db"); // or your MySQL connection file
 
