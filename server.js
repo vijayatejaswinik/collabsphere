@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const pool = require("./db"); // or your MySQL connection file
+const pool = require("./config/db"); // or your MySQL connection file
 
 app.get("/test", async (req, res) => {
   try {
