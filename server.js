@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 
 const pool = require("./config/db"); // or your MySQL connection file
 
-app.get("/testt", async (req, res) => {
+app.get("/test", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT NOW() AS time;");
     res.send(`✅ Backend and DB working fine! Server time: ${rows[0].time}`);
