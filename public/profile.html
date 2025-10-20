@@ -47,7 +47,7 @@ main { max-width:600px; margin:2rem auto; padding:2rem; background:white; border
 </main>
 
 <script>
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://collabsphere-uww0.onrender.com';
 const profileForm = document.getElementById('profileForm');
 const message = document.getElementById('message');
 
@@ -63,7 +63,17 @@ function updateDisplay(user){
 
 async function loadProfile(){
   try{
+<<<<<<< HEAD
     const res = await fetch(`${BASE_URL}/profile/me`, { credentials:'include' });
+=======
+    // ❌ OLD: `${BASE_URL}/api/profile/me`
+    // ✅ FIX: The route is mounted at /profile in server.js
+    const res = await fetch(`${BASE_URL}/profile/me`, { 
+      method: 'GET',
+      credentials: 'include' 
+    });
+    
+>>>>>>> 77d808602a515261e6836fa48538a458fe45f8a4
     if(!res.ok) throw new Error(`Failed: ${res.status}`);
     const user = await res.json();
     document.getElementById('name').value = user.name||'';
@@ -95,8 +105,15 @@ profileForm.addEventListener('submit', async (e)=>{
   };
 
   try{
+<<<<<<< HEAD
     const res = await fetch(`${BASE_URL}/profile/update`, {
       method:'PUT', 
+=======
+    // ❌ OLD: `${BASE_URL}/api/profile/update`
+    // ✅ FIX: The route is mounted at /profile in server.js
+    const res = await fetch(`${BASE_URL}/profile/update`, {
+      method:'POST', 
+>>>>>>> 77d808602a515261e6836fa48538a458fe45f8a4
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(userData), 
       credentials:'include'
