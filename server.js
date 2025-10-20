@@ -15,19 +15,23 @@ const selectionRoutes = require('./routes/selection');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://collabsphere-uww0.onrender.com',
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session setup
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }, // for HTTPS
+}));
+
+
 
 // API Routes
 app.use('/auth', authRoutes);
@@ -52,6 +56,8 @@ app.use('/js', express.static(path.join(__dirname, 'routes')));
 app.get('/test', (req, res) => {
   res.send('Test route is working!');
 });
+
+
 
 
 // Start server
