@@ -20,7 +20,7 @@ const BASE_URL = 'http://localhost:3000';
 
 async function loadNotifications() {
   try {
-    const res = await fetch(`${BASE_URL}/api/notifications`, { credentials: 'include' });
+    const res = await fetch(`${BASE_URL}/notifications`, { credentials:'include' });
     const data = await res.json();
     const container = document.getElementById('notifContainer');
     container.innerHTML = '';
@@ -33,20 +33,18 @@ async function loadNotifications() {
     data.forEach(n => {
       const div = document.createElement('div');
       div.className = 'notification';
-
       div.innerHTML = `<p>${n.message.replace(/\n/g,'<br>')}</p>${n.link ? `<a href="${n.link}">View</a>` : ''}<div class="actions" id="actions-${n.id}"></div>`;
 
-      if (n.type === 'application') { // make sure type matches backend
+      if (n.type === 'application') {
         const actions = div.querySelector(`#actions-${n.id}`);
         actions.innerHTML = `
           <button class="accept" onclick="handleDecision('${n.project_id}','${n.applicant_id}','accept')">Accept</button>
           <button class="reject" onclick="handleDecision('${n.project_id}','${n.applicant_id}','reject')">Reject</button>
         `;
       }
-
       container.appendChild(div);
     });
-  } catch (err) {
+  } catch(err) {
     console.error('Error loading notifications:', err);
     document.getElementById('notifContainer').innerHTML = '<p>Failed to load notifications.</p>';
   }
@@ -55,16 +53,16 @@ async function loadNotifications() {
 async function handleDecision(projectId, applicantId, type) {
   if (!confirm(`Are you sure you want to ${type} this applicant?`)) return;
   try {
-    const endpoint = type === 'accept' ? `${BASE_URL}/api/selection/select` : `${BASE_URL}/api/selection/reject-applicant`;
+    const endpoint = type === 'accept' ? `${BASE_URL}/selection/select` : `${BASE_URL}/selection/reject-applicant`;
     await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ projectId, applicantId })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({ projectId, applicantId })
     });
     alert(`${type === 'accept' ? 'Accepted' : 'Rejected'} successfully.`);
     loadNotifications();
-  } catch (err) {
+  } catch(err) {
     console.error('Decision error:', err);
     alert('Failed to process. Try again.');
   }
@@ -72,6 +70,7 @@ async function handleDecision(projectId, applicantId, type) {
 
 loadNotifications();
 </script>
+
 
 </body>
 </html>
