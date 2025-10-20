@@ -3,8 +3,6 @@ const session = require('express-session');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const MySQLStore = require('express-mysql-session')(session);
-require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
@@ -17,7 +15,7 @@ const app = express();
 
 // ✅ 1. CORS setup (must specify frontend origin)
 app.use(cors({
-  origin: 'https://collabsphere-frontend.onrender.com', // ⬅️ replace with your actual frontend Render URL
+  origin: 'https://collabsphere-uww0.onrender.com', // ⬅️ replace with your actual frontend Render URL
   credentials: true,
 }));
 
