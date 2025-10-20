@@ -15,10 +15,8 @@ const selectionRoutes = require('./routes/selection');
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: 'https://collabsphere-uww0.onrender.com',
-  credentials: true
-}));
+app.use(cors({ credentials: true }));
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
