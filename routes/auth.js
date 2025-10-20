@@ -1,4 +1,4 @@
-// routes/auth.js - CORRECTED VERSION
+// routes/auth.js - LOCALHOST VERSION
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -109,8 +109,7 @@ router.post('/logout', (req, res) => {
             console.error('Logout error:', err);
             return res.status(500).json({ error: 'Logout failed' });
         }
-        // 👇 FIX: Use the configured session key 'collabsphere.sid'
-        res.clearCookie('collabsphere.sid'); 
+        res.clearCookie('connect.sid'); 
         res.json({ ok: true, message: 'Logged out successfully' });
     });
 });
