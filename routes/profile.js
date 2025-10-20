@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../config/db');
 
 // Get logged-in user profile
-router.get('/me', async (req, res) => {
+router.get('api/profile/me', async (req, res) => {
   if (!req.session.user) {
     console.log('❌ No session user');
     return res.status(401).json({ error: 'Unauthorized' });
