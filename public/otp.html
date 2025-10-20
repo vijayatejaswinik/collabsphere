@@ -22,7 +22,8 @@
     <button id="resendBtn">Resend OTP</button>
   </main>
 
-  <script>
+<script>
+const BASE_URL = 'http://localhost:3000';
 const userEmail = document.getElementById('userEmail');
 const userId = sessionStorage.getItem('userId');
 const email = sessionStorage.getItem('email');
@@ -43,7 +44,7 @@ document.getElementById('otpForm').addEventListener('submit', async (e) => {
   message.textContent = 'Verifying OTP...';
 
   try {
-    const res = await fetch('api/auth/verify-otp', {
+    const res = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, otp }),
@@ -66,9 +67,8 @@ document.getElementById('otpForm').addEventListener('submit', async (e) => {
 // ✅ Resend OTP
 resendBtn.addEventListener('click', async () => {
   message.textContent = 'Resending OTP...';
-
   try {
-    const res = await fetch('api/auth/register', {
+    const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'temp', email, password: 'temp' }),
@@ -82,6 +82,5 @@ resendBtn.addEventListener('click', async () => {
   }
 });
 </script>
-
 </body>
 </html>

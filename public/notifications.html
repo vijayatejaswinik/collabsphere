@@ -5,105 +5,73 @@
   <title>Notifications - Collabsphere</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .notification {
-      background: #fff;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 10px;
-    }
-    .actions button {
-      margin-right: 5px;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .accept { background: #27ae60; color: white; }
-    .reject { background: #c0392b; color: white; }
+    body{font-family:Arial,sans-serif;padding:20px;}
+    .notification{background:#fff;padding:10px 15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;}
+    .actions button{margin-right:5px;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;}
+    .accept{background:#27ae60;color:white;}
+    .reject{background:#c0392b;color:white;}
   </style>
 </head>
 <body>
-  <h2>Notifications</h2>
-  <div id="notifContainer"></div>
+<h2>Notifications</h2>
+<div id="notifContainer"></div>
+<script>
+const BASE_URL = 'http://localhost:3000';
 
-  <script>
-    const BASE_URL = 'https://collabsphere-09q9.onrender.com';
+async function loadNotifications() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/notifications`, { credentials: 'include' });
+    const data = await res.json();
+    const container = document.getElementById('notifContainer');
+    container.innerHTML = '';
 
-    async function loadNotifications() {
-      try {
-        const res = await fetch(`/api/notifications`, { credentials: 'include' });
-        const data = await res.json();
-
-        const container = document.getElementById('notifContainer');
-        container.innerHTML = '';
-
-        if (!data.length) {
-          container.innerHTML = '<p>No notifications yet.</p>';
-          return;
-        }
-
-        data.forEach(n => {
-          const div = document.createElement('div');
-          div.className = 'notification';
-          div.innerHTML = `
-            <p>${n.message.replace(/\n/g, '<br>')}</p>
-            ${n.link ? `<a href="${n.link}">View</a>` : ''}
-            <div class="actions" id="actions-${n.id}"></div>
-          `;
-
-          if (n.type === 'new_application') {
-            const match = n.link?.match(/id=(\d+)/);
-            const projectId = match ? match[1] : null;
-            const msg = n.message;
-            const applicantMatch = msg.match(/👤 (.*?) applied/);
-            const applicantName = applicantMatch ? applicantMatch[1] : null;
-
-            const actions = div.querySelector(`#actions-${n.id}`);
-            actions.innerHTML = `
-              <button class="accept" onclick="handleDecision('${projectId}', '${applicantName}', 'accept')">Accept</button>
-              <button class="reject" onclick="handleDecision('${projectId}', '${applicantName}', 'reject')">Reject</button>
-            `;
-          }
-
-          container.appendChild(div);
-        });
-      } catch (err) {
-        console.error('Error loading notifications:', err);
-        document.getElementById('notifContainer').innerHTML = '<p>Failed to load notifications.</p>';
-      }
+    if (!data.length) {
+      container.innerHTML = '<p>No notifications yet.</p>';
+      return;
     }
 
-    async function handleDecision(projectId, applicantName, type) {
-      if (!confirm(`Are you sure you want to ${type} ${applicantName}?`)) return;
+    data.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'notification';
 
-      try {
-        const res = await fetch(`/api/projects/${projectId}/applicants`, { credentials: 'include' });
-        const applicants = await res.json();
-        const target = applicants.find(a => a.name === applicantName);
-        if (!target) return alert('Applicant not found.');
+      div.innerHTML = `<p>${n.message.replace(/\n/g,'<br>')}</p>${n.link ? `<a href="${n.link}">View</a>` : ''}<div class="actions" id="actions-${n.id}"></div>`;
 
-        const endpoint = type === 'accept'
-          ? `${BASE_URL}/api/selection/select`
-          : `${BASE_URL}/api/selection/reject-applicant`;
-
-        await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ projectId, applicantId: target.id })
-        });
-
-        alert(`${type === 'accept' ? 'Accepted' : 'Rejected'} successfully.`);
-        loadNotifications();
-      } catch (err) {
-        console.error('Decision error:', err);
-        alert('Failed to process. Try again.');
+      if (n.type === 'application') { // make sure type matches backend
+        const actions = div.querySelector(`#actions-${n.id}`);
+        actions.innerHTML = `
+          <button class="accept" onclick="handleDecision('${n.project_id}','${n.applicant_id}','accept')">Accept</button>
+          <button class="reject" onclick="handleDecision('${n.project_id}','${n.applicant_id}','reject')">Reject</button>
+        `;
       }
-    }
 
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Error loading notifications:', err);
+    document.getElementById('notifContainer').innerHTML = '<p>Failed to load notifications.</p>';
+  }
+}
+
+async function handleDecision(projectId, applicantId, type) {
+  if (!confirm(`Are you sure you want to ${type} this applicant?`)) return;
+  try {
+    const endpoint = type === 'accept' ? `${BASE_URL}/api/selection/select` : `${BASE_URL}/api/selection/reject-applicant`;
+    await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ projectId, applicantId })
+    });
+    alert(`${type === 'accept' ? 'Accepted' : 'Rejected'} successfully.`);
     loadNotifications();
-  </script>
+  } catch (err) {
+    console.error('Decision error:', err);
+    alert('Failed to process. Try again.');
+  }
+}
+
+loadNotifications();
+</script>
+
 </body>
 </html>

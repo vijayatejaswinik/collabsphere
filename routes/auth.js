@@ -1,13 +1,9 @@
-// routes/auth.js - FINAL FIXED VERSION
+// routes/auth.js - LOCALHOST VERSION
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const { sendOtpEmail } = require('./email');
-
-axios.defaults.withCredentials = true;
-
 
 // ✅ REGISTER (with OTP)
 router.post('/register', async (req, res) => {

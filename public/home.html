@@ -17,7 +17,7 @@
     <a href="profile.html">My Profile</a>
     <a href="create-project.html">Projects</a>
     <a href="notifications.html">Notifications</a>
-    <!-- <a href="admin.html" id="adminLink">Admin Panel</a> -->
+    <a href="admin.html" id="adminLink">Admin Panel</a>
     <button id="logoutBtn">Logout</button>
   </aside>
 
@@ -48,13 +48,13 @@
 
     <hr>
     <section>
-      <h3>Active Projects</h3>
+     <!-- <h3>Active Projects</h3> -->
       <div id="projectsList"></div>
     </section>
   </main>
 
   <script>
-    const BASE_URL = 'https://collabsphere-09q9.onrender.com';
+    const BASE_URL = 'http://localhost:3000';
 
     document.addEventListener('DOMContentLoaded', () => {
       const sidebar = document.getElementById('sidebar');
@@ -69,23 +69,20 @@
         sidebar.classList.toggle('show');
       });
 
-      // Close sidebar when clicking outside
       document.addEventListener('click', (event) => {
         if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
           sidebar.classList.remove('show');
         }
       });
 
-      // Hide admin link safely if it's present
+      // Hide admin link if not admin
       const isAdmin = sessionStorage.getItem('isAdmin') === '1';
-      if (adminLink && !isAdmin) {
-        adminLink.style.display = 'none';
-      }
+      if (adminLink && !isAdmin) adminLink.style.display = 'none';
 
       // Logout
       logoutBtn.addEventListener('click', async () => {
         try {
-          await fetch(`/auth/logout`, { method: 'POST', credentials: 'include' });
+          await fetch(`${BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
         } catch (err) {
           console.error('Logout API error:', err);
         }
@@ -98,7 +95,7 @@
       async function loadProjects() {
         projectsList.innerHTML = '<p>Loading projects…</p>';
         try {
-          const res = await fetch(`/api/projects/all`, { credentials: 'include' });
+          const res = await fetch(`${BASE_URL}/api/projects/all`, { credentials: 'include' });
           if (!res.ok) throw new Error('Failed to load projects');
           const projects = await res.json();
 
@@ -109,7 +106,7 @@
           }
 
           projects
-            .filter(p => p.status === 'approved') // show only approved projects
+            .filter(p => p.status === 'approved')
             .forEach(p => {
               const div = document.createElement('div');
               div.className = 'project-card';
@@ -127,7 +124,6 @@
               projectsList.appendChild(div);
             });
 
-          // Button event listeners
           projectsList.addEventListener('click', async (e) => {
             const applyBtn = e.target.closest('.apply-btn');
             const shareBtn = e.target.closest('.share-btn');
@@ -146,10 +142,9 @@
         }
       }
 
-      // Apply to project
       async function apply(id) {
         try {
-          const res = await fetch(`/api/projects/apply`, {
+          const res = await fetch(`${BASE_URL}/api/projects/apply`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -163,7 +158,6 @@
         }
       }
 
-      // Copy project link
       function copyLink(id) {
         const url = `${window.location.origin}/project.html?id=${id}`;
         navigator.clipboard.writeText(url)
@@ -174,7 +168,6 @@
           });
       }
 
-      // Escape HTML (security)
       function escapeHtml(str) {
         return String(str)
           .replaceAll('&', '&amp;')
@@ -184,8 +177,7 @@
           .replaceAll("'", '&#39;');
       }
 
-      // Initial load
-      loadProjects();
+   //   loadProjects();
     });
   </script>
 </body>

@@ -20,9 +20,8 @@
     <p id="message"></p>
   </main>
 
- <script>
-
-
+<script>
+const BASE_URL = 'http://localhost:3000';
 const form = document.getElementById('registerForm');
 const message = document.getElementById('message');
 
@@ -36,7 +35,7 @@ form.addEventListener('submit', async (e) => {
   message.textContent = 'Registering...';
 
   try {
-    const res = await fetch('api/auth/register', {
+    const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
@@ -57,6 +56,5 @@ form.addEventListener('submit', async (e) => {
   }
 });
 </script>
-
 </body>
 </html>

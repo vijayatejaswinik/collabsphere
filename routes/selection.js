@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
-const axios = require('axios');
-axios.defaults.withCredentials = true;
 
-
-// Require login
+// Require login for all routes
 router.use((req, res, next) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   next();
@@ -17,13 +14,33 @@ router.post('/select', async (req, res) => {
   const user = req.session.user;
 
   try {
-    const [[project]] = await pool.query('SELECT title, user_id FROM projects WHERE id = ?', [projectId]);
+    // Correct destructuring
+    const [rows] = await pool.query(
+      'SELECT title, user_id FROM projects WHERE id = ?',
+      [projectId]
+    );
+    const project = rows[0];
+
     if (!project) return res.status(404).json({ error: 'Project not found' });
-    if (project.user_id !== user.id && !user.is_admin) return res.status(403).json({ error: 'Forbidden' });
+    if (project.user_id !== user.id && Number(user.is_admin) !== 1) return res.status(403).json({ error: 'Forbidden' });
 
-    await pool.query('UPDATE applications SET status = ? WHERE project_id = ? AND user_id = ?', ['accepted', projectId, applicantId]);
-    await pool.query('INSERT IGNORE INTO project_members (project_id, user_id, status) VALUES (?, ?, ?)', [projectId, applicantId, 'selected']);
+    // Update application status
+    const [result] = await pool.query(
+      'UPDATE applications SET status = ? WHERE project_id = ? AND user_id = ?',
+      ['accepted', projectId, applicantId]
+    );
 
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ error: 'Application not found or already processed' });
+    }
+
+    // Add to project members
+    await pool.query(
+      'INSERT IGNORE INTO project_members (project_id, user_id, status) VALUES (?, ?, ?)',
+      [projectId, applicantId, 'selected']
+    );
+
+    // Notify applicant
     await pool.query(
       'INSERT INTO notifications (user_id, type, message, link) VALUES (?, ?, ?, ?)',
       [
@@ -34,10 +51,10 @@ router.post('/select', async (req, res) => {
       ]
     );
 
-    res.json({ ok: true });
+    return res.status(200).json({ ok: true, message: 'Applicant selected successfully.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error selecting applicant:', err);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -47,12 +64,27 @@ router.post('/reject-applicant', async (req, res) => {
   const user = req.session.user;
 
   try {
-    const [[project]] = await pool.query('SELECT title, user_id FROM projects WHERE id = ?', [projectId]);
+    // Correct destructuring
+    const [rows] = await pool.query(
+      'SELECT title, user_id FROM projects WHERE id = ?',
+      [projectId]
+    );
+    const project = rows[0];
+
     if (!project) return res.status(404).json({ error: 'Project not found' });
-    if (project.user_id !== user.id && !user.is_admin) return res.status(403).json({ error: 'Forbidden' });
+    if (project.user_id !== user.id && Number(user.is_admin) !== 1) return res.status(403).json({ error: 'Forbidden' });
 
-    await pool.query('UPDATE applications SET status = ? WHERE project_id = ? AND user_id = ?', ['rejected', projectId, applicantId]);
+    // Update application status
+    const [result] = await pool.query(
+      'UPDATE applications SET status = ? WHERE project_id = ? AND user_id = ?',
+      ['rejected', projectId, applicantId]
+    );
 
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ error: 'Application not found or already processed' });
+    }
+
+    // Notify applicant
     await pool.query(
       'INSERT INTO notifications (user_id, type, message, link) VALUES (?, ?, ?, ?)',
       [
@@ -63,10 +95,10 @@ router.post('/reject-applicant', async (req, res) => {
       ]
     );
 
-    res.json({ ok: true });
+    return res.status(200).json({ ok: true, message: 'Applicant rejected successfully.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error rejecting applicant:', err);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 

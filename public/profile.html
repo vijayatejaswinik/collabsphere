@@ -5,112 +5,48 @@
     <title>My Profile - Collabsphere</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Add specific styles for the profile page layout */
-        main {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        #profileForm label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        #profileForm input[type="text"],
-        #profileForm input[type="number"],
-        #profileForm select,
-        #profileForm textarea {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 0.75rem;
-        }
-        
-        #profileForm button[type="submit"] {
-            padding: 0.75rem;
-            font-size: 1.1rem;
-            border-radius: 4px;
-        }
-
-        .profile-display {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-top: 2px solid #ddd;
-        }
-
-        .profile-display h2 {
-            color: #4b6cb7;
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .profile-display p {
-            margin: 0.5rem 0;
-            line-height: 1.5;
-        }
-        .profile-display span {
-            font-weight: bold;
-            color: #333;
-            display: inline-block;
-            min-width: 100px;
-        }
+        main { max-width:600px; margin:2rem auto; padding:2rem; background:white; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+        #profileForm label{display:block; margin-bottom:0.25rem; font-weight:bold; color:#333;}
+        #profileForm input, #profileForm select, #profileForm textarea{border:1px solid #ccc; border-radius:4px; padding:0.75rem;}
+        #profileForm button{padding:0.75rem; font-size:1.1rem; border-radius:4px;}
+        .profile-display{margin-top:2rem; padding:1.5rem; border-top:2px solid #ddd;}
+        .profile-display h2{color:#4b6cb7; margin-top:0; border-bottom:1px solid #eee; padding-bottom:0.5rem; margin-bottom:1rem;}
+        .profile-display p{margin:0.5rem 0; line-height:1.5;}
+        .profile-display span{font-weight:bold; color:#333; display:inline-block; min-width:100px;}
     </style>
 </head>
 <body>
-    <header><h1>My Profile</h1></header>
-    <main>
-        <form id="profileForm">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" placeholder="Full Name" required>
+<header><h1>My Profile</h1></header>
+<main>
+    <form id="profileForm">
+        <label for="name">Full Name</label><input type="text" id="name" placeholder="Full Name" required>
+        <label for="bio">Short Bio</label><textarea id="bio" placeholder="Short Bio"></textarea>
+        <label for="whatsapp">WhatsApp Number</label><input type="text" id="whatsapp" placeholder="e.g., +91 9876543210">
+        <label for="gender">Gender</label><select id="gender"><option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+        <label for="age">Age</label><input type="number" id="age" placeholder="Your Age" min="13" max="120">
+        <label for="portfolio">Portfolio/Website URL (Optional)</label><input type="text" id="portfolio" placeholder="e.g., https://yourportfolio.com">
+        <button type="submit">Save Profile</button>
+        <p id="message"></p>
+    </form>
 
-            <label for="bio">Short Bio</label>
-            <textarea id="bio" placeholder="Short Bio"></textarea>
-            
-            <label for="whatsapp">WhatsApp Number</label>
-            <input type="text" id="whatsapp" placeholder="e.g., +91 9876543210">
+    <div class="profile-display">
+        <h2>Current Profile Details</h2>
+        <p><span>Name:</span> <span id="display-name">...</span></p>
+        <p><span>Bio:</span> <span id="display-bio">...</span></p>
+        <p><span>WhatsApp:</span> <span id="display-whatsapp">...</span></p>
+        <p><span>Gender:</span> <span id="display-gender">...</span></p>
+        <p><span>Age:</span> <span id="display-age">...</span></p>
+        <p><span>Portfolio:</span> <span id="display-portfolio">...</span></p>
+    </div>
+</main>
 
-            <label for="gender">Gender</label>
-            <select id="gender">
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <label for="age">Age</label>
-            <input type="number" id="age" placeholder="Your Age" min="13" max="120">
-
-            <label for="portfolio">Portfolio/Website URL (Optional)</label>
-            <input type="text" id="portfolio" placeholder="e.g., https://yourportfolio.com">
-
-            <button type="submit">Save Profile</button>
-            <p id="message"></p>
-        </form>
-
-        <div class="profile-display">
-            <h2>Current Profile Details</h2>
-            <p><span>Name:</span> <span id="display-name">...</span></p>
-            <p><span>Bio:</span> <span id="display-bio">...</span></p>
-            <p><span>WhatsApp:</span> <span id="display-whatsapp">...</span></p>
-            <p><span>Gender:</span> <span id="display-gender">...</span></p>
-            <p><span>Age:</span> <span id="display-age">...</span></p>
-            <p><span>Portfolio:</span> <span id="display-portfolio">...</span></p>
-        </div>
-    </main>
-
-    <script>
+<script>
+const BASE_URL = 'http://localhost:3000';
 const profileForm = document.getElementById('profileForm');
 const message = document.getElementById('message');
 
-function updateDisplay(user) {
-  const getText = (v) => v || 'Not set';
+function updateDisplay(user){
+  const getText = (v) => v||'Not set';
   document.getElementById('display-name').textContent = getText(user.name);
   document.getElementById('display-bio').textContent = getText(user.bio);
   document.getElementById('display-whatsapp').textContent = getText(user.whatsapp);
@@ -119,61 +55,60 @@ function updateDisplay(user) {
   document.getElementById('display-portfolio').textContent = getText(user.portfolio);
 }
 
-async function loadProfile() {
-  try {
-    const res = await fetch('/api/profile/me', {
-      credentials: 'include'
-    });
-    if (!res.ok) throw new Error(`Failed: ${res.status}`);
+async function loadProfile(){
+  try{
+    const res = await fetch(`${BASE_URL}/api/profile/me`, { credentials:'include' });
+    if(!res.ok) throw new Error(`Failed: ${res.status}`);
     const user = await res.json();
-    document.getElementById('name').value = user.name || '';
-    document.getElementById('bio').value = user.bio || '';
-    document.getElementById('whatsapp').value = user.whatsapp || '';
-    document.getElementById('gender').value = user.gender || '';
-    document.getElementById('age').value = user.age || '';
-    document.getElementById('portfolio').value = user.portfolio || '';
+    document.getElementById('name').value = user.name||'';
+    document.getElementById('bio').value = user.bio||'';
+    document.getElementById('whatsapp').value = user.whatsapp||'';
+    document.getElementById('gender').value = user.gender||'';
+    document.getElementById('age').value = user.age||'';
+    document.getElementById('portfolio').value = user.portfolio||'';
     updateDisplay(user);
-  } catch (err) {
-    console.error('Error loading profile:', err);
-    message.textContent = '❌ Could not load profile. Please ensure you are logged in.';
-    message.style.color = 'red';
+  }catch(err){
+    console.error('Error loading profile:',err);
+    message.textContent='❌ Could not load profile. Make sure you are logged in.';
+    message.style.color='red';
   }
 }
 
-profileForm.addEventListener('submit', async (e) => {
+profileForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
-  message.textContent = 'Saving...';
-  message.style.color = 'orange';
+  message.textContent='Saving...'; 
+  message.style.color='orange';
 
+  // ✅ FIXED: explicitly get values from inputs
   const userData = {
-    name: name.value,
-    bio: bio.value,
-    whatsapp: whatsapp.value,
-    gender: gender.value,
-    age: age.value,
-    portfolio: portfolio.value
+    name: document.getElementById('name').value,
+    bio: document.getElementById('bio').value,
+    whatsapp: document.getElementById('whatsapp').value,
+    gender: document.getElementById('gender').value,
+    age: document.getElementById('age').value,
+    portfolio: document.getElementById('portfolio').value
   };
 
-  try {
-    const res = await fetch('/api/profile/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-      credentials: 'include'
+  try{
+    const res = await fetch(`${BASE_URL}/api/profile/update`, {
+      method:'POST', 
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(userData), 
+      credentials:'include'
     });
     const data = await res.json();
-    if (res.ok) {
-      message.textContent = '✅ Profile updated successfully!';
-      message.style.color = 'green';
+    if(res.ok){
+      message.textContent='✅ Profile updated successfully!'; 
+      message.style.color='green';
       updateDisplay(userData);
-    } else {
-      message.textContent = data.error || '❌ Failed to update profile.';
-      message.style.color = 'red';
+    }else{
+      message.textContent=data.error||'❌ Failed to update profile.'; 
+      message.style.color='red';
     }
-  } catch (err) {
-    console.error('Update error:', err);
-    message.textContent = '❌ Network error while saving.';
-    message.style.color = 'red';
+  }catch(err){
+    console.error('Update error:',err);
+    message.textContent='❌ Network error while saving.'; 
+    message.style.color='red';
   }
 });
 
