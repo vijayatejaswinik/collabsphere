@@ -4,6 +4,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+// ✅ 3. MySQL session store (so sessions persist even if server restarts)
+const MySQLStore = require('express-mysql-session')(session);
+
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const adminRoutes = require('./routes/admin');
@@ -23,8 +26,6 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ 3. MySQL session store (so sessions persist even if server restarts)
-const MySQLStore = require('express-mysql-session')(session);
 const sessionStore = new MySQLStore({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 3306,
