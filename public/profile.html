@@ -57,8 +57,13 @@ function updateDisplay(user){
 
 async function loadProfile(){
   try{
-    const res = await fetch(`${BASE_URL}/api/profile/me`, {  method: 'GET',
-  credentials: 'include' });
+    // ❌ OLD: `${BASE_URL}/api/profile/me`
+    // ✅ FIX: The route is mounted at /profile in server.js
+    const res = await fetch(`${BASE_URL}/profile/me`, { 
+      method: 'GET',
+      credentials: 'include' 
+    });
+    
     if(!res.ok) throw new Error(`Failed: ${res.status}`);
     const user = await res.json();
     document.getElementById('name').value = user.name||'';
@@ -80,7 +85,6 @@ profileForm.addEventListener('submit', async (e)=>{
   message.textContent='Saving...'; 
   message.style.color='orange';
 
-  // ✅ FIXED: explicitly get values from inputs
   const userData = {
     name: document.getElementById('name').value,
     bio: document.getElementById('bio').value,
@@ -91,7 +95,9 @@ profileForm.addEventListener('submit', async (e)=>{
   };
 
   try{
-    const res = await fetch(`${BASE_URL}/api/profile/update`, {
+    // ❌ OLD: `${BASE_URL}/api/profile/update`
+    // ✅ FIX: The route is mounted at /profile in server.js
+    const res = await fetch(`${BASE_URL}/profile/update`, {
       method:'POST', 
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(userData), 
