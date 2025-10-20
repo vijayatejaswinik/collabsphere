@@ -49,6 +49,11 @@ app.get(spaRoutes, (req, res) => {
 // Optional: serve JS from routes folder if frontend uses scripts from there
 app.use('/js', express.static(path.join(__dirname, 'routes')));
 
+app.get('/test', (req, res) => {
+  res.send('Test route is working!');
+});
+
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
