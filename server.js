@@ -23,12 +23,15 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret',
+  secret: 'your_secret',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }, // for HTTPS
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true, // true for HTTPS (Render uses HTTPS)
+    sameSite: 'none', // critical for cross-domain
+  }
 }));
 
 
@@ -56,8 +59,6 @@ app.use('/js', express.static(path.join(__dirname, 'routes')));
 app.get('/test', (req, res) => {
   res.send('Test route is working!');
 });
-
-
 
 
 // Start server
