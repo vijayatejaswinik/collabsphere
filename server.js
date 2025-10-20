@@ -3,6 +3,7 @@ const session = require('express-session');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const MySQLStore = require('express-mysql-session')(session);
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -14,27 +15,42 @@ const selectionRoutes = require('./routes/selection');
 
 const app = express();
 
-// Middleware
-app.use(cors({ credentials: true }));
+// ✅ 1. CORS setup (must specify frontend origin)
+app.use(cors({
+  origin: 'https://collabsphere-frontend.onrender.com', // ⬅️ replace with your actual frontend Render URL
+  credentials: true,
+}));
 
-
+// ✅ 2. Body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// ✅ 3. MySQL session store (so sessions persist even if server restarts)
+const MySQLStore = require('express-mysql-session')(session);
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+// ✅ 4. Session configuration
 app.use(session({
+  key: 'collabsphere.sid',
   secret: 'your_secret',
+  store: sessionStore,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: true, // true for HTTPS (Render uses HTTPS)
-    sameSite: 'none', // critical for cross-domain
-  }
+    secure: true, // Render uses HTTPS
+    sameSite: 'none', // required for cross-domain cookies
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+  },
 }));
 
-
-
-// API Routes
+// ✅ 5. API Routes
 app.use('/auth', authRoutes);
 app.use('/projects', projectRoutes);
 app.use('/admin', adminRoutes);
@@ -42,25 +58,22 @@ app.use('/profile', profileRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/selection', selectionRoutes);
 
-// Serve static frontend files
+// ✅ 6. Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// SPA Fallback for frontend routing (explicit paths only)
-const spaRoutes = ['/','/profile','/projects','/notifications','/selection'];
+// ✅ 7. SPA fallback routes
+const spaRoutes = ['/', '/profile', '/projects', '/notifications', '/selection'];
 app.get(spaRoutes, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Optional: serve JS from routes folder if frontend uses scripts from there
-app.use('/js', express.static(path.join(__dirname, 'routes')));
-
+// ✅ 8. Optional test route
 app.get('/test', (req, res) => {
   res.send('Test route is working!');
 });
 
-
-// Start server
+// ✅ 9. Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
